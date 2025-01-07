@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Periodic Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .element {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .element:hover {
+            transform: scale(1.1);
+            background-color: #1f474a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-metal {
+            background-color: #709821;
+            color: white;
+        }
+
+        .category-nonmetal {
+            background-color: #329896;
+            color: white;
+        }
+
+        .category-metalloid {
+            background-color: #a39d2c;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #element-info {
+            padding-left: 25px;
+            margin-left: 10px;
+            padding-right: 15px;
+            padding-bottom: 5px;
+            padding-top: 3px;
+            color: aliceblue;
+            border: 1px solid #3a3526;
+            border-radius: 5px;
+            background-color: #151313e8;
+            animation: fadeIn 0.1s ease-out;
+            position: absolute;
+            top: calc(2*55px); 
+            left: 15%;
+            right: 37%;
+            z-index: 2;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes highlightGroupAnimation {
+            0% {
+                background-color: transparent;
+            }
+            100% {
+                background-color: rgba(255, 223, 0, 0.4);
+            }
+        }
+
+        @keyframes highlightPeriodAnimation {
+            0% {
+                background-color: transparent;
+            }
+            100% {
+                background-color: rgba(0, 153, 255, 0.4);
+            }
+        }
+
+        .highlight-group {
+            animation: highlightGroupAnimation 0.5s ease-out;
+        }
+
+        .highlight-period {
+            animation: highlightPeriodAnimation 0.5s ease-out;
+        }
+        .page-heading {
+            text-align: center;
+            font-size: 2.5em;
+            color: #1d4f1f; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4caf50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        
+        #start-quiz {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+
+        #start-quiz:hover {
+            background: #388e3c;
+
+        }
+
+       
+        #quiz-container {
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            margin: 20px auto;
+            display: none; 
+        }
+
+        #quiz-content {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        
+        #next-question {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            display: none; 
+        }
+
+        #next-question:hover {
+            background: #0d47a1;
+        }
+
+       
+        #quiz-result {
+            font-size: 1.5em;
+            color: #ff5722;
+            margin-top: 20px;
+            display: none; 
+        }
+
+        
+        #quiz-container button {
+            background: #e0f7fa;
+            color: #333;
+            border: 2px solid #4caf50;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #quiz-container button:hover {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            #start-quiz {
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+
+            #quiz-container {
+                width: 90%;
+            }
+        }
+        .option-button.selected {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+
+    </style>
+</head>
+<body>          
+    <h1 class="page-heading">Periodic Table (1 - 54)</h1>
+    <br>
+    <div id="periodic-table"></div>
+    <div id="element-info" class="hidden"></div>
+    <hr>
+    <h2>Periodic Table Quiz</h2>
+    <button id="start-quiz">Start Quiz</button>
+
+    <div id="quiz-container">
+        <div id="quiz-content"></div>
+        <button id="next-question" style="display: none;">Next Question</button>
+        <div id="quiz-result" style="display: none;"></div>
+    </div>
+    
+    <script>
+        const elements = [
+                    { symbol: "H", name: "Hydrogen", atomicNumber: 1, atomicMass: 1.008, category: "nonmetal", gridColumn: "1 / 2", gridRow: "1", uses: "Used in fuel cells, ammonia production, and hydrogenation processes." },
+                    { symbol: "He", name: "Helium", atomicNumber: 2, atomicMass: 4.0026, category: "nonmetal", gridColumn: "18 / 19", gridRow: "1", uses: "Used as a lifting gas in balloons, in cooling superconducting magnets." },
+                    { symbol: "Li", name: "Lithium", atomicNumber: 3, atomicMass: 6.94, category: "metal", gridColumn: "1 / 2", gridRow: "2", uses: "Used in rechargeable batteries, mental health medications." },
+                    { symbol: "Be", name: "Beryllium", atomicNumber: 4, atomicMass: 9.0122, category: "metal", gridColumn: "2 / 3", gridRow: "2", uses: "Used in aerospace components, X-ray windows, and nuclear reactors." },
+                    { symbol: "B", name: "Boron", atomicNumber: 5, atomicMass: 10.81, category: "metalloid", gridColumn: "13 / 14", gridRow: "2", uses: "Used in glass production, detergents, and semiconductors." },
+                    { symbol: "C", name: "Carbon", atomicNumber: 6, atomicMass: 12.011, category: "nonmetal", gridColumn: "14 / 15", gridRow: "2", uses: "Used in steel production, fuels, and as the basis of organic chemistry." },
+                    { symbol: "N", name: "Nitrogen", atomicNumber: 7, atomicMass: 14.007, category: "nonmetal", gridColumn: "15 / 16", gridRow: "2", uses: "Used in fertilizers, explosives, and as an inert gas in industries." },
+                    { symbol: "O", name: "Oxygen", atomicNumber: 8, atomicMass: 15.999, category: "nonmetal", gridColumn: "16 / 17", gridRow: "2", uses: "Essential for respiration, used in steelmaking." },
+                    { symbol: "F", name: "Fluorine", atomicNumber: 9, atomicMass: 18.998, category: "nonmetal", gridColumn: "17 / 18", gridRow: "2", uses: "Used in toothpaste, refrigerants, and Teflon production." },
+                    { symbol: "Ne", name: "Neon", atomicNumber: 10, atomicMass: 20.180, category: "nonmetal", gridColumn: "18 / 19", gridRow: "2", uses: "Used in neon signs and high-voltage indicators." },
+                    { symbol: "Na", name: "Sodium", atomicNumber: 11, atomicMass: 22.990, category: "metal", gridColumn: "1 / 2", gridRow: "3", uses: "Used in table salt, streetlights, and as a heat transfer fluid." },
+                    { symbol: "Mg", name: "Magnesium", atomicNumber: 12, atomicMass: 24.305, category: "metal", gridColumn: "2 / 3", gridRow: "3", uses: "Used in lightweight alloys, fireworks, and as a dietary supplement." },
+                    { symbol: "Al", name: "Aluminum", atomicNumber: 13, atomicMass: 26.982, category: "metal", gridColumn: "13 / 14", gridRow: "3", uses: "Used in cans, foils, and aerospace components." },
+                    { symbol: "Si", name: "Silicon", atomicNumber: 14, atomicMass: 28.085, category: "metalloid", gridColumn: "14 / 15", gridRow: "3", uses: "Used in semiconductors, solar panels, and glass production." },
+                    { symbol: "P", name: "Phosphorus", atomicNumber: 15, atomicMass: 30.974, category: "nonmetal", gridColumn: "15 / 16", gridRow: "3", uses: "Used in fertilizers, matches, and steel production." },
+                    { symbol: "S", name: "Sulfur", atomicNumber: 16, atomicMass: 32.06, category: "nonmetal", gridColumn: "16 / 17", gridRow: "3", uses: "Used in sulfuric acid, vulcanized rubber, and insecticides." },
+                    { symbol: "Cl", name: "Chlorine", atomicNumber: 17, atomicMass: 35.45, category: "nonmetal", gridColumn: "17 / 18", gridRow: "3", uses: "Used in water disinfection, bleach, and PVC production." },
+                    { symbol: "Ar", name: "Argon", atomicNumber: 18, atomicMass: 39.948, category: "nonmetal", gridColumn: "18 / 19", gridRow: "3", uses: "Used as an inert shielding gas in welding and in light bulbs." },
+                    { symbol: "K", name: "Potassium", atomicNumber: 19, atomicMass: 39.098, category: "metal", gridColumn: "1 / 2", gridRow: "4", uses: "Used in fertilizers, glass production, and as a dietary supplement." },
+                    { symbol: "Ca", name: "Calcium", atomicNumber: 20, atomicMass: 40.078, category: "metal", gridColumn: "2 / 3", gridRow: "4", uses: "Used in cement, dietary supplements, and as a reducing agent." },
+                    { symbol: "Sc", name: "Scandium", atomicNumber: 21, atomicMass: 44.956, category: "metal", gridColumn: "3 / 4", gridRow: "4", uses: "Used in aerospace components, high-intensity lamps, and alloys." },
+                    { symbol: "Ti", name: "Titanium", atomicNumber: 22, atomicMass: 47.867, category: "metal", gridColumn: "4 / 5", gridRow: "4", uses: "Used in aircraft, medical implants, and pigments." },
+                    { symbol: "V", name: "Vanadium", atomicNumber: 23, atomicMass: 50.942, category: "metal", gridColumn: "5 / 6", gridRow: "4", uses: "Used in steel alloys, catalysts, and batteries." },
+                    { symbol: "Cr", name: "Chromium", atomicNumber: 24, atomicMass: 51.996, category: "metal", gridColumn: "6 / 7", gridRow: "4", uses: "Used in stainless steel, electroplating, and pigments." },
+                    { symbol: "Mn", name: "Manganese", atomicNumber: 25, atomicMass: 54.938, category: "metal", gridColumn: "7 / 8", gridRow: "4", uses: "Used in steel production, batteries, and pigments." },
+                    { symbol: "Fe", name: "Iron", atomicNumber: 26, atomicMass: 55.845, category: "metal", gridColumn: "8 / 9", gridRow: "4", uses: "Used in steel production, magnets, and hemoglobin in blood." },
+                    { symbol: "Co", name: "Cobalt", atomicNumber: 27, atomicMass: 58.933, category: "metal", gridColumn: "9 / 10", gridRow: "4", uses: "Used in alloys, batteries, and pigments." },
+                    { symbol: "Ni", name: "Nickel", atomicNumber: 28, atomicMass: 58.693, category: "metal", gridColumn: "10 / 11", gridRow: "4", uses: "Used in stainless steel, coins, and batteries." },
+                    { symbol: "Cu", name: "Copper", atomicNumber: 29, atomicMass: 63.546, category: "metal", gridColumn: "11 / 12", gridRow: "4", uses: "Used in electrical wiring, plumbing, and coins." },
+                    { symbol: "Zn", name: "Zinc", atomicNumber: 30, atomicMass: 65.38, category: "metal", gridColumn: "12 / 13", gridRow: "4", uses: "Used in galvanization, alloys, and dietary supplements." },
+                    { symbol: "Ga", name: "Gallium", atomicNumber: 31, atomicMass: 69.723, category: "metal", gridColumn: "13 / 14", gridRow: "4", uses: "Used in semiconductors, LEDs, and solar panels." },
+                    { symbol: "Ge", name: "Germanium", atomicNumber: 32, atomicMass: 72.630, category: "metalloid", gridColumn: "14 / 15", gridRow: "4", uses: "Used in fiber optics, infrared optics, and semiconductors." },
+                    { symbol: "As", name: "Arsenic", atomicNumber: 33, atomicMass: 74.922, category: "metalloid", gridColumn: "15 / 16", gridRow: "4", uses: "Used in pesticides, semiconductors, and wood preservatives." },
+                    { symbol: "Se", name: "Selenium", atomicNumber: 34, atomicMass: 78.971, category: "nonmetal", gridColumn: "16 / 17", gridRow: "4", uses: "Used in photocopiers, glass production, and dietary supplements." },
+                    { symbol: "Br", name: "Bromine", atomicNumber: 35, atomicMass: 79.904, category: "nonmetal", gridColumn: "17 / 18", gridRow: "4", uses: "Used in flame retardants, water treatment, and pesticides." },
+                    { symbol: "Kr", name: "Krypton", atomicNumber: 36, atomicMass: 83.798, category: "nonmetal", gridColumn: "18 / 19", gridRow: "4", uses: "Used in lighting, photography, and lasers." },
+                    { symbol: "Rb", name: "Rubidium", atomicNumber: 37, atomicMass: 85.468, category: "metal", gridColumn: "1 / 2", gridRow: "5", uses: "Used in atomic clocks, specialty glasses, and research." },
+                    { symbol: "Sr", name: "Strontium", atomicNumber: 38, atomicMass: 87.62, category: "metal", gridColumn: "2 / 3", gridRow: "5", uses: "Used in fireworks, ceramics, and radiation detection." },
+                    { symbol: "Y", name: "Yttrium", atomicNumber: 39, atomicMass: 88.906, category: "metal", gridColumn: "3 / 4", gridRow: "5", uses: "Used in LEDs, lasers, and superconductors." },
+                    { symbol: "Zr", name: "Zirconium", atomicNumber: 40, atomicMass: 91.224, category: "metal", gridColumn: "4 / 5", gridRow: "5", uses: "Used in nuclear reactors, ceramics, and jewelry." },
+                    { symbol: "Nb", name: "Niobium", atomicNumber: 41, atomicMass: 92.906, category: "metal", gridColumn: "5 / 6", gridRow: "5", uses: "Used in superconductors, steel alloys, and medical implants." },
+                    { symbol: "Mo", name: "Molybdenum", atomicNumber: 42, atomicMass: 95.95, category: "metal", gridColumn: "6 / 7", gridRow: "5", uses: "Used in steel alloys, lubricants, and catalysts." },
+                    { symbol: "Tc", name: "Technetium", atomicNumber: 43, atomicMass: 98, category: "metal", gridColumn: "7 / 8", gridRow: "5", uses: "Used in medical imaging and research." },
+                    { symbol: "Ru", name: "Ruthenium", atomicNumber: 44, atomicMass: 101.07, category: "metal", gridColumn: "8 / 9", gridRow: "5", uses: "Used in electronics, alloys, and catalysts." },
+                    { symbol: "Rh", name: "Rhodium", atomicNumber: 45, atomicMass: 102.91, category: "metal", gridColumn: "9 / 10", gridRow: "5", uses: "Used in catalytic converters, jewelry, and mirrors." },
+                    { symbol: "Pd", name: "Palladium", atomicNumber: 46, atomicMass: 106.42, category: "metal", gridColumn: "10 / 11", gridRow: "5", uses: "Used in catalytic converters, electronics, and jewelry." },
+                    { symbol: "Ag", name: "Silver", atomicNumber: 47, atomicMass: 107.87, category: "metal", gridColumn: "11 / 12", gridRow: "5", uses: "Used in jewelry, photography, and electronics." },
+                    { symbol: "Cd", name: "Cadmium", atomicNumber: 48, atomicMass: 112.41, category: "metal", gridColumn: "12 / 13", gridRow: "5", uses: "Used in batteries, pigments, and coatings." },
+                    { symbol: "In", name: "Indium", atomicNumber: 49, atomicMass: 114.82, category: "metal", gridColumn: "13 / 14", gridRow: "5", uses: "Used in touchscreens, semiconductors, and alloys." },
+                    { symbol: "Sn", name: "Tin", atomicNumber: 50, atomicMass: 118.71, category: "metal", gridColumn: "14 / 15", gridRow: "5", uses: "Used in soldering, tin plating, and alloys." },
+                    { symbol: "Sb", name: "Antimony", atomicNumber: 51, atomicMass: 121.76, category: "metalloid", gridColumn: "15 / 16", gridRow: "5", uses: "Used in flame retardants, alloys, and semiconductors." },
+                    { symbol: "Te", name: "Tellurium", atomicNumber: 52, atomicMass: 127.60, category: "metalloid", gridColumn: "16 / 17", gridRow: "5", uses: "Used in thermoelectric devices, alloys, and solar panels." },
+                    { symbol: "I", name: "Iodine", atomicNumber: 53, atomicMass: 126.90, category: "nonmetal", gridColumn: "17 / 18", gridRow: "5", uses: "Used in disinfectants, dietary supplements, and medical imaging." },
+                    { symbol: "Xe", name: "Xenon", atomicNumber: 54, atomicMass: 131.29, category: "nonmetal", gridColumn: "18 / 19", gridRow: "5", uses: "Used in lighting, anesthesia, and ion propulsion systems." }
+                ];
+
+        function createPeriodicTable() {
+            const tableContainer = document.getElementById("periodic-table");
+
+            elements.forEach((element) => {
+                const elementDiv = document.createElement("div");
+                elementDiv.className = `element category-${element.category}`;
+                elementDiv.style.gridColumn = element.gridColumn;
+                elementDiv.style.gridRow = element.gridRow;
+                elementDiv.innerHTML = `
+                    <div>${element.symbol}</div>
+                    <div>${element.atomicNumber}</div>
+                `;
+
+                elementDiv.addEventListener("mouseover", () => {
+                    showElementInfo(element);
+                });
+                elementDiv.addEventListener("mouseout", () => {
+                    const infoContainer = document.getElementById("element-info");
+                    infoContainer.classList.add("hidden");
+                    infoContainer.style.display = "none";
+                });
+
+                tableContainer.appendChild(elementDiv);
+            });
+        }
+
+        function showElementInfo(element) {
+        const infoContainer = document.getElementById("element-info");
+
+        infoContainer.innerHTML = `
+        <h2>${element.name} (${element.symbol})</h2>
+        <div style="display: flex; flex-direction: row; gap: 20px; margin-bottom: 0; padding-bottom: 0;">
+        <p style="margin: 0;">Atomic Number: ${element.atomicNumber},</p>
+        <p style="margin: 0;">Atomic Mass: ${element.atomicMass}</p>
+        </div>
+        <p style="margin: 3;">Category: ${element.category}</p>
+        <p style="margin: 3;">Uses: ${element.uses}</p>
+    `;
+
+
+        infoContainer.classList.remove("hidden");
+        infoContainer.style.display = "inline-block";
+    }
+    const quizQuestions = [
+            {
+                question: "What is the atomic number of Oxygen?",
+                options: ["6", "7", "8", "9"],
+                correctAnswer: "8",
+            },
+            {
+                question: "What is the chemical symbol for Sodium?",
+                options: ["S", "Na", "K", "So"],
+                correctAnswer: "Na",
+            },
+            {
+                question: "What is the atomic mass of Carbon?",
+                options: ["12", "14", "16", "18"],
+                correctAnswer: "12",
+            },
+            {
+                question: "Which category does Helium belong to?",
+                options: ["Metal", "metalloid", "Noble Gas", "Halogen"],
+                correctAnswer: "Noble Gas",
+            },
+            {
+                question: "What is the symbol for Potassium?",
+                options: ["P", "Pt", "K", "Po"],
+                correctAnswer: "K",
+            },
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const startButton = document.getElementById("start-quiz");
+        const quizContainer = document.getElementById("quiz-container");
+        const quizContent = document.getElementById("quiz-content");
+        const nextButton = document.getElementById("next-question");
+        const quizResult = document.getElementById("quiz-result");
+
+        startButton.addEventListener("click", () => {
+            score = 0;
+            currentQuestionIndex = 0;
+            quizContainer.style.display = "block";
+            startButton.style.display = "none";
+            showQuestion();
+        });
+
+        function showQuestion() {
+            const question = quizQuestions[currentQuestionIndex];
+            quizContent.innerHTML = `
+                <div class="question"><strong>Q${currentQuestionIndex + 1}:</strong> ${question.question}</div>
+                <div class="options" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            `;
+            const optionsContainer = quizContent.querySelector(".options");
+
+            question.options.forEach((option) => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.addEventListener("click", () => selectAnswer(option));
+                optionsContainer.appendChild(button);
+            });
+
+            nextButton.style.display = "none";
+        }
+
+        function selectAnswer(selectedOption) {
+            const question = quizQuestions[currentQuestionIndex];
+            if (selectedOption === question.correctAnswer) {
+                score++;
+            }
+            nextButton.style.display = "inline-block";
+        }
+
+        nextButton.addEventListener("click", () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                showQuestion();
+            } else {
+                displayResult();
+            }
+        });
+
+        function displayResult() {
+            quizContent.innerHTML = "";
+            nextButton.style.display = "none";
+            quizResult.style.display = "block";
+            quizResult.innerHTML = `
+                <h2>Quiz Completed!</h2>
+                <p>Your score: ${score} out of ${quizQuestions.length}</p>
+                <button onclick="restartQuiz()">Restart Quiz</button>
+            `;
+        }
+
+        function restartQuiz() {
+            quizResult.style.display = "none";
+            startButton.style.display = "inline-block";
+        }
+
+        document.addEventListener("DOMContentLoaded", createPeriodicTable);
+    </script>
+</body>
+</html>
